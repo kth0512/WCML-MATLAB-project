@@ -37,13 +37,9 @@ function symbolArray = QAM16(bitSequence)
 end
 
 function noiseArray = generateAWGN(N0, length)  
-    noiseArray = zeros(1, length);
-
-    for i = 1:length
-        realPart = normrnd(0, sqrt(N0/2));
-        imaginaryPart = normrnd(0, sqrt(N0/2));
-        noiseArray(i) = realPart + 1i*imaginaryPart;
-    end
+    realPart = normrnd(0, sqrt(N0/2), [1, length]);
+    imaginaryPart = normrnd(0, sqrt(N0/2), [1, length]);
+    noiseArray = realPart + 1i*imaginaryPart;
 end 
 
 function receivedSignalArray = generateReceivedSignal(symbolArray, noiseArray, Ex)
