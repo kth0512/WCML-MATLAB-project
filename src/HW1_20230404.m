@@ -1,81 +1,97 @@
-function bin_bit_seq = random_bit_seq_generating
-    bin_bit_seq = randi([0 1], 1, 1024);
+function randomBitSequence = generateRandomBitSequence(length)
+    randomBitSequence = randi([0 1], 1, length);
 end
 
-function s_array = symbol_mapping(b, M)
-    s_array = [];
-     if M == 2
-         for i = 1:1024
-             s_array = [s_array, 2*b(i)-1];
-         end
-     elseif M == 4
-         coeffcient = [1/sqrt(2), -1/sqrt(2)];
-         for i = 1:2:1024
-             s_array = [s_array, coeffcient(b(i+1)+1)+1i*coeffcient(b(i)+1)];  
-         end
-     elseif M == 16
-         coeffcient = [3/sqrt(10), 1/sqrt(10); -3/sqrt(10), -1/sqrt(10)];
-         for i = 1:4:1024
-             real_index = coeffcient(2-b(i), 1+b(i+1));
-             imag_index = coeffcient(1+b(i+2), 1+b(i+3));
-             s_array = [s_array, real_index+1i*imag_index];
-         end
+function symbolArray = mapBitsToSymbols(bitSequence, M)
+    switch M
+        case 2,  symbolArray = BPSK(bitSequence);
+        case 4, symbolArray = QPSK(bitSequence);
+        case 16, symbolArray = QAM16(bitSequence);
+        otherwise, error('Unsupported M = %d', M);
     end
+
 end
 
-function v_array = awgn_generating(N0, M) 
-    v_array = [];
-    N = 1024/log2(M);
-    for i = 1:N
-        re_v = normrnd(0, sqrt(N0/2));
-        im_v = normrnd(0, sqrt(N0/2));
-        v_array = [v_array, re_v + 1i*im_v];
+function symbolArray = BPSK(bitSequence)
+    symbolArray = 2*bitSequence - 1;
+end
+
+function symbolArray = QPSK(bitSequence)
+     bitsPerSymbol = 2;
+     bitPairs = reshape(bitSequence, bitsPerSymbol, []);
+     realPart = 1 - 2*bitPairs(2, :);
+     imaginaryPart = 1 - 2*bitPairs(1, :);
+     symbolArray = (realPart + 1i*imaginaryPart)/sqrt(2);
+end
+
+function symbolArray = QAM16(bitSequence)
+    bitsPerSymbol = 4;
+    bitQuartets = reshape(bitSequence, bitsPerSymbol, []);
+    realPamLevel = [-3, -1, 3, 1]/sqrt(10);
+    imaginaryPamLevel = [3, 1, -3, -1]/sqrt(10);
+
+    realIndex = 2*bitQuartets(1, :) + bitQuartets(2, :) + 1;
+    imaginaryIndex = 2*bitQuartets(3, :) + bitQuartets(4, :) + 1;
+
+    symbolArray = realPamLevel(realIndex) + imaginaryPamLevel(imaginaryIndex)*1i;
+end
+
+function noiseArray = generateAWGN(N0, length)  
+    noiseArray = zeros(1, length);
+
+    for i = 1:length
+        realPart = normrnd(0, sqrt(N0/2));
+        imaginaryPart = normrnd(0, sqrt(N0/2));
+        noiseArray(i) = realPart + 1i*imaginaryPart;
     end
 end 
 
-function y_array = received_signals_generating(s_array, v_array, E_x)
-    y_array = sqrt(E_x)*s_array + v_array;
+function receivedSignalArray = generateReceivedSignal(symbolArray, noiseArray, Ex)
+    receivedSignalArray = sqrt(Ex)*symbolArray + noiseArray;
 end
 
 % main code
-M = [2, 4, 16];
-Ex_N0 = [1, 1; 10, 10; 1, 0.01];
+% generate sequences and plot received signals in complex plane
+MArray = [2, 4, 16];
+ExArray = [1, 10, 1];
+N0Array = [1, 10, 0.01];
 
 figure;
-plot_index = 1;
+plotIndex = 1;
 
-for m = M
+for m = MArray
     for i = 1:3
-        Ex = Ex_N0(i, 1);
-        N0 = Ex_N0(i, 2);
+        Ex = ExArray(i);
+        N0 = N0Array(i);
         
-        b = random_bit_seq_generating;
-        s = symbol_mapping(b, m);
-        v = awgn_generating(N0, m);
-        y = received_signals_generating(s, v, Ex);
+        bitSequence = generateRandomBitSequence(1024);
+        symbolSequence = mapBitsToSymbols(bitSequence, m);
+        noiseSequence = generateAWGN(N0, numel(symbolSequence));
+        receivedSignalSequence = generateReceivedSignal(symbolSequence, noiseSequence, Ex);
 
-        re = real(y);
-        im = imag(y);
+        realPart = real(receivedSignalSequence);
+        imaginaryPart = imag(receivedSignalSequence);
         
-        subplot(3, 3, plot_index)
-        scatter(re, im, 3,'filled');
+        subplot(3, 3, plotIndex)
+        scatter(realPart, imaginaryPart, 3,'filled');
         xlabel('In-Phase');
         ylabel('Quadrature');
         title('scatter plot')
         
-        if N0 == 1
-            xlim([-3.5, 3.5])
-            ylim([-3.5, 3.5])
+        switch N0
+            case 1 
+                xlim([-3.5, 3.5])
+                ylim([-3.5, 3.5])
 
-        elseif N0 == 10
-            xlim([-10.5, 10.5])
-            ylim([-10.5, 10.5]) 
+            case 10
+                xlim([-10.5, 10.5])
+                ylim([-10.5, 10.5]) 
 
-        elseif N0 == 0.01
-            xlim([-1.5, 1.5])
-            ylim([-1.5, 1.5])
+            case 0.01
+                xlim([-1.5, 1.5])
+                ylim([-1.5, 1.5])
         end
 
-        plot_index = plot_index + 1;
+        plotIndex = plotIndex + 1;
     end
 end
