@@ -4,19 +4,19 @@ end
 
 function symbolArray = mapBitsToSymbols(bitSequence, M)
     switch M
-        case 2,  symbolArray = BPSK(bitSequence);
-        case 4, symbolArray = QPSK(bitSequence);
-        case 16, symbolArray = QAM16(bitSequence);
+        case 2,  symbolArray = bpskModulation(bitSequence);
+        case 4, symbolArray = qpskModulation(bitSequence);
+        case 16, symbolArray = qam16Modulation(bitSequence);
         otherwise, error('Unsupported M = %d', M);
     end
 
 end
 
-function symbolArray = BPSK(bitSequence)
+function symbolArray = bpskModulation(bitSequence)
     symbolArray = 2*bitSequence - 1;
 end
 
-function symbolArray = QPSK(bitSequence)
+function symbolArray = qpskModulation(bitSequence)
      bitsPerSymbol = 2;
      bitPairs = reshape(bitSequence, bitsPerSymbol, []);
      realPart = 1 - 2*bitPairs(2, :);
@@ -24,7 +24,7 @@ function symbolArray = QPSK(bitSequence)
      symbolArray = (realPart + 1i*imaginaryPart)/sqrt(2);
 end
 
-function symbolArray = QAM16(bitSequence)
+function symbolArray = qam16Modulation(bitSequence)
     bitsPerSymbol = 4;
     bitQuartets = reshape(bitSequence, bitsPerSymbol, []);
     realPamLevel = [-3, -1, 3, 1]/sqrt(10);
@@ -40,6 +40,7 @@ function noiseArray = generateAWGN(N0, length)
     realPart = normrnd(0, sqrt(N0/2), [1, length]);
     imaginaryPart = normrnd(0, sqrt(N0/2), [1, length]);
     noiseArray = realPart + 1i*imaginaryPart;
+ 
 end 
 
 function receivedSignalArray = generateReceivedSignal(symbolArray, noiseArray, Ex)
@@ -48,17 +49,17 @@ end
 
 % main code
 % generate sequences and plot received signals in complex plane
-MArray = [2, 4, 16];
-ExArray = [1, 10, 1];
-N0Array = [1, 10, 0.01];
+listOfM = [2, 4, 16];
+listOfEx = [1, 10, 1];
+listOfN0 = [1, 10, 0.01];
 
 figure;
 plotIndex = 1;
 
-for m = MArray
+for m = listOfM
     for i = 1:3
-        Ex = ExArray(i);
-        N0 = N0Array(i);
+        Ex = listOfEx(i);
+        N0 = listOfN0(i);
         
         bitSequence = generateRandomBitSequence(1024);
         symbolSequence = mapBitsToSymbols(bitSequence, m);
