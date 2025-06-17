@@ -6,11 +6,11 @@ N0 = 1;
 M = 16;
 lengthOfBitSequence = 4*100;
 numOfSymbol = 100;
-SNR_BER = zeros(101, 6);
+SNR_BER = zeros(41, 6);
 
 for i = 1:numOfNtr
     Ntr = ListOfNtr(i);
-    for j = 0:100 % 0~16dB
+    for j = 0:40 
         Ex = 10^(j/10);
         sumOfBER = 0;
         zadoffChuTrainingSequence = generateZadoffChuTrainingSequence(1, Ntr);
@@ -36,6 +36,7 @@ end
 disp(SNR_BER)
 figure;
 hold on;
+grid on;
 semilogy(SNR_BER(:, 1), SNR_BER(:, 2), '-o', 'MarkerEdgeColor', 'b', 'DisplayName', 'Ntr = 2');
 semilogy(SNR_BER(:, 3), SNR_BER(:, 4), '-o', 'MarkerEdgeColor', 'r', 'DisplayName', 'Ntr = 5');
 semilogy(SNR_BER(:, 5), SNR_BER(:, 6), '-o', 'MarkerEdgeColor', 'g', 'DisplayName', 'Ntr = 10');
