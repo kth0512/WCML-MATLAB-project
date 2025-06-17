@@ -5,33 +5,32 @@ numOfIteration = 1000;
 N0 = 1;
 M = 16;
 lengthOfBitSequence = 4*100;
-SNR_BER = zeros(17, 6);
+numOfSymbol = 100;
+SNR_BER = zeros(101, 6);
 
-for i = 0:16 % 0~16dB
-    Ex = 10^(i/10);
-    sumOfBER = zeros(1, numOfNtr);
-    for j = 1:numOfIteration
-        FrequencyFlatChannel = generateFrequencyFlatChannel;
-        bitSequence = generateRandomBitSequence(lengthOfBitSequence);
-        transmittedSymbolSequence = mapBitsToSymbols(bitSequence, M);
-        noiseSequence = generateAWGN(N0, numel(transmittedSymbolSequence));
-        receivedSignalSequence = generateReceivedSignalInFreqFlat(transmittedSymbolSequence, noiseSequence, Ex, FrequencyFlatChannel);
-        for k = 1:numOfNtr
-            Ntr = ListOfNtr(k);
-            zadoffChuTrainingSequence = generateZadoffChuTrainingSequence(1, Ntr);
-            noiseSequenceForTraining = generateAWGN(N0, Ntr);
-            receivedTrainingSequence = generateReceivedSignalInFreqFlat(zadoffChuTrainingSequence, noiseSequenceForTraining, Ex, FrequencyFlatChannel);
-            estimatedChannel = channelEstimationInFreqFlatWithLS(sqrt(Ex)*zadoffChuTrainingSequence, receivedTrainingSequence);
-            equalizedSymbolArray = equalizeFreqFlatChannel(receivedSignalSequence, estimatedChannel);
-            estimatedSymbolArray = detectSymbolsWithML(equalizedSymbolArray, M, Ex);
-            estimatedBitSequence = mapSymbolsToBits(estimatedSymbolArray, M);
-            
-            sumOfBER(k) = sumOfBER(k) + calculateBER(bitSequence, estimatedBitSequence);
+for i = 1:numOfNtr
+    Ntr = ListOfNtr(i);
+    for j = 0:100 % 0~16dB
+        Ex = 10^(j/10);
+        sumOfBER = 0;
+        zadoffChuTrainingSequence = generateZadoffChuTrainingSequence(1, Ntr);
+        for k = 1:numOfIteration
+            h = generateFrequencyFlatChannel;
+            bitSequence = generateRandomBitSequence(lengthOfBitSequence);
+            s = mapBitsToSymbols(bitSequence, M);
+            v = generateAWGN(N0, numOfSymbol+Ntr);
+            symbolWithTraining = [zadoffChuTrainingSequence s];
+            y = generateReceivedSignalInFreqFlat(symbolWithTraining, v, Ex, h);
+            yTraining = y(1:Ntr);
+            hHat = channelEstimationInFreqFlatWithLS(zadoffChuTrainingSequence, yTraining);
+            yEq = equalizeFreqFlatChannel(y, hHat);
+            sHat = detectSymbolsWithML(yEq(Ntr+1:numOfSymbol+Ntr), M, 1);
+            estimatedBitSequence = mapSymbolsToBits(sHat, M);
+            BER = calculateBER(bitSequence, estimatedBitSequence);
+            sumOfBER = sumOfBER + BER;
         end
-    end
-    averageOfBER = sumOfBER/numOfIteration;
-    for t = 1:numOfNtr
-        SNR_BER(i+1, 2*t-1:2*t) = [i, averageOfBER(t)];
+        averageOfBER = sumOfBER/numOfIteration;
+        SNR_BER(j+1, 2*i-1:2*i) = [j, averageOfBER];
     end
 end
 disp(SNR_BER)
