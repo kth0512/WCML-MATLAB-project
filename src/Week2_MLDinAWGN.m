@@ -16,7 +16,7 @@ for t = 1:3
         b = generateRandomBitSequence(N);
         s = mapBitsToSymbols(b, m);
         v = generateAWGN(N0, numel(s));
-        y = generateReceivedSignal(s, v, Ex);      
+        y = generateReceivedSignalInAWGN(s, v, Ex);      
 
         s_hat = detectSymbolsWithML(y, m, Ex);
         est_b = mapSymbolsToBits(s_hat, m);
@@ -62,7 +62,7 @@ for t = 1:3
         b_3 = repelem(b, 3);
         s_3 = mapBitsToSymbols(b_3, m);
         v_3 = generateAWGN(N0, numel(s_3));
-        y_3 = generateReceivedSignal(s_3, v_3, Ex);      
+        y_3 = generateReceivedSignalInAWGN(s_3, v_3, Ex);      
 
         s_hat_3 = detectSymbolsWithML(y_3, m, Ex);
         est_b_3 = mapSymbolsToBits(s_hat_3, m);
