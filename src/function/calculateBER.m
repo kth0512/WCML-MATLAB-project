@@ -1,4 +1,5 @@
-function ber = calculateBER(bin_bit_seq, estimated_bit_seq, N)
-    error_count = sum(bin_bit_seq ~= estimated_bit_seq);
-    ber = error_count/N;
+function ber = calculateBER(originalBitSequence, estimatedBitSequence)
+    length = numel(estimatedBitSequence);
+    errorCount = sum(originalBitSequence ~= estimatedBitSequence);
+    ber = errorCount/length;
 end
