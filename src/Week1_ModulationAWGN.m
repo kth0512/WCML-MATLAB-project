@@ -15,7 +15,7 @@ for m = listOfM
         bitSequence = generateRandomBitSequence(lengthOfBitSequence);
         symbolSequence = mapBitsToSymbols(bitSequence, m);
         noiseSequence = generateAWGN(N0, numel(symbolSequence));
-        receivedSignalSequence = generateReceivedSignal(symbolSequence, noiseSequence, Ex);
+        receivedSignalSequence = generateReceivedSignalInAWGN(symbolSequence, noiseSequence, Ex);
 
         realPart = real(receivedSignalSequence);
         imaginaryPart = imag(receivedSignalSequence);
