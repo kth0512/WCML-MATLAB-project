@@ -1,83 +1,51 @@
-% WEEK 10 CODE (for experiment, with slight modification)
-function bin_bit_seq = random_bit_seq_generating(N)
-    bin_bit_seq = randi([0 1], 1, N);
-end
-
-function s_array = symbol_mapping(b, M, N)
-     if M == 2
-         s_array = zeros(1, N);
-         for i = 1:N 
-             s_array(i) = 2*b(i)-1;
-         end
-     elseif M == 4
-         s_array = zeros(1, N/2);
-         coeffcient = [1/sqrt(2), -1/sqrt(2)];
-         for i = 1:2:N
-             s_array((i+1)/2) = coeffcient(b(i+1)+1)+1i*coeffcient(b(i)+1);  
-         end
-     elseif M == 16
-         s_array = zeros(1, N/4);
-         coeffcient = [3/sqrt(10), 1/sqrt(10); -3/sqrt(10), -1/sqrt(10)];
-         for i = 1:4:N
-             real_index = coeffcient(2-b(i), 1+b(i+1));
-             imag_index = coeffcient(1+b(i+2), 1+b(i+3));
-             s_array((i+3)/4) = real_index+1i*imag_index;
-         end
+function estimatedSymbolArray = maximumLikelihoodDetection(receivedSignalArray, M, Ex)
+    switch M
+        case 2,  estimatedsymbolArray = demodulateBPSK(bitSequence);
+        case 4, estimatedsymbolArray = demodulateQPSK(bitSequence);
+        case 16, estimatedsymbolArray = demodulate16QAM(bitSequence);
+        otherwise, error('Unsupported M = %d', M);
     end
 end
-
-function v_array = awgn_generating(N0, M, N) 
-    k = N/log2(M);
-    re_v = normrnd(0, sqrt(N0/2), [1, k]);
-    im_v = normrnd(0, sqrt(N0/2), [1, k]);
-    v_array = re_v + 1i*im_v;
-end
-
-function y_array = received_signals_generating(s_array, v_array, E_x)
-    y_array = sqrt(E_x)*s_array + v_array;
-end
-
-% WEEK 11 CODE
-function s_hat_array = ml_detection(y_array, M, Ex)
-    l = length(y_array);
+    % -----------------------------
+    l = length(receivedSignalArray);
    
     if M == 2 
-        s_hat_array = ones(1, l); 
+        estimatedSymbolArray = ones(1, l); 
         for i = 1:l
-            if real(y_array(i)) < 0
-                s_hat_array(i) = -1;
+            if real(receivedSignalArray(i)) < 0
+                estimatedSymbolArray(i) = -1;
 
             end
         end
 
     elseif M == 4
-        s_hat_array = sqrt(1/2)*ones(2, l); % row1: real, row2: imag
+        estimatedSymbolArray = sqrt(1/2)*ones(2, l); % row1: real, row2: imag
         for i = 1:l
-            if real(y_array(i)) < 0
-                s_hat_array(1, i) = -sqrt(1/2);
+            if real(receivedSignalArray(i)) < 0
+                estimatedSymbolArray(1, i) = -sqrt(1/2);
             end
-            if imag(y_array(i)) < 0
-                s_hat_array(2, i) = -sqrt(1/2);
+            if imag(receivedSignalArray(i)) < 0
+                estimatedSymbolArray(2, i) = -sqrt(1/2);
             end
 
         end 
     elseif M == 16 % Ex
-        s_hat_array =   sqrt(1/10)*ones(2, l); % row1: real, row2: imag
+        estimatedSymbolArray =   sqrt(1/10)*ones(2, l); % row1: real, row2: imag
         for i = 1:l
-            if real(y_array(i)) > 2*sqrt(Ex/10)
-                s_hat_array(1, i) = 3*sqrt(1/10);
-            elseif real(y_array(i)) < -2*sqrt(Ex/10)
-                s_hat_array(1, i) = -3*sqrt(1/10);
-            elseif real(y_array(i)) < 0
-                s_hat_array(1, i) = -sqrt(1/10);
+            if real(receivedSignalArray(i)) > 2*sqrt(Ex/10)
+                estimatedSymbolArray(1, i) = 3*sqrt(1/10);
+            elseif real(receivedSignalArray(i)) < -2*sqrt(Ex/10)
+                estimatedSymbolArray(1, i) = -3*sqrt(1/10);
+            elseif real(receivedSignalArray(i)) < 0
+                estimatedSymbolArray(1, i) = -sqrt(1/10);
             end
 
-            if imag(y_array(i)) > 2*sqrt(Ex/10)
-                s_hat_array(2, i) = 3*sqrt(1/10);
-            elseif imag(y_array(i)) < -2*sqrt(Ex/10)
-                s_hat_array(2, i) = -3*sqrt(1/10);
-            elseif imag(y_array(i)) < 0
-                s_hat_array(2, i) = -sqrt(1/10);
+            if imag(receivedSignalArray(i)) > 2*sqrt(Ex/10)
+                estimatedSymbolArray(2, i) = 3*sqrt(1/10);
+            elseif imag(receivedSignalArray(i)) < -2*sqrt(Ex/10)
+                estimatedSymbolArray(2, i) = -3*sqrt(1/10);
+            elseif imag(receivedSignalArray(i)) < 0
+                estimatedSymbolArray(2, i) = -sqrt(1/10);
             end
         end
 
@@ -86,48 +54,48 @@ function s_hat_array = ml_detection(y_array, M, Ex)
 
 end
 
-function estimated_bit_seq = inverse_symbol_mapping(s_hat_array, M)
+function estimatedBitSequence = mapSymbolsToBits(estimatedSymbolArray, M)
     if M == 2
-        estimated_bit_seq = 0.5*(s_hat_array + 1);
+        estimatedBitSequence = 0.5*(estimatedSymbolArray + 1);
 
     elseif M == 4
-        l = length(s_hat_array);
+        l = length(estimatedSymbolArray);
         estimated_bit_mat = zeros(2, l);
         for i = 1:l
-            if s_hat_array(1, i) < 0 % real: -sqrt(1/2)
+            if estimatedSymbolArray(1, i) < 0 % real: -sqrt(1/2)
                 estimated_bit_mat(2, i) = 1;
             end 
-            if s_hat_array(2, i) < 0
+            if estimatedSymbolArray(2, i) < 0
                 estimated_bit_mat(1, i) = 1;
             end
         end
-        estimated_bit_seq = estimated_bit_mat(:)';
+        estimatedBitSequence = estimated_bit_mat(:)';
         
                 
     elseif M == 16
-        l = length(s_hat_array); 
+        l = length(estimatedSymbolArray); 
         estimated_bit_mat = zeros(4, l);
         for i = 1:l
-            if s_hat_array(1, i) == 3*sqrt(1/10)
+            if estimatedSymbolArray(1, i) == 3*sqrt(1/10)
                 estimated_bit_mat(1, i) = 1;
-            elseif s_hat_array(1, i) == sqrt(1/10)
+            elseif estimatedSymbolArray(1, i) == sqrt(1/10)
                 estimated_bit_mat(1, i) = 1;
                 estimated_bit_mat(2, i) = 1;
-            elseif s_hat_array(1, i) == -sqrt(1/10)
+            elseif estimatedSymbolArray(1, i) == -sqrt(1/10)
                 estimated_bit_mat(2, i) = 1;
             end
 
-            if s_hat_array(2, i) == sqrt(1/10)
+            if estimatedSymbolArray(2, i) == sqrt(1/10)
                 estimated_bit_mat(4, i) = 1;
-            elseif s_hat_array(2, i) == -sqrt(1/10)
+            elseif estimatedSymbolArray(2, i) == -sqrt(1/10)
                 estimated_bit_mat(3, i) = 1;
                 estimated_bit_mat(4, i) = 1;
-            elseif s_hat_array(2, i) == -3*sqrt(1/10)
+            elseif estimatedSymbolArray(2, i) == -3*sqrt(1/10)
                 estimated_bit_mat(3, i) = 1;
             end
         end
             
-        estimated_bit_seq = estimated_bit_mat(:)';
+        estimatedBitSequence = estimated_bit_mat(:)';
     end
 
 end 
@@ -140,6 +108,7 @@ end
 
     
 % main code
+addpath('function/');
 M = [2, 4, 16];
 N0 = 1;
 N = 100000;
@@ -153,13 +122,13 @@ for t = 1:3
 
         for j = 1:100
 
-        b = random_bit_seq_generating(N);
-        s = symbol_mapping(b, m, N);
-        v = awgn_generating(N0, m, N);
-        y = received_signals_generating(s, v, Ex);      
+        b = generateRandomBitSequence(N);
+        s = mapBitsToSymbols(b, m, N);
+        v = generateAWGN(N0, numel(s));
+        y = generateReceivedSignal(s, v, Ex);      
 
-        s_hat = ml_detection(y, m, Ex);
-        est_b = inverse_symbol_mapping(s_hat, m);
+        s_hat = maximumLikelihoodDetection(y, m, Ex);
+        est_b = mapSymbolsToBits(s_hat, m);
 
         ber_sum = ber_sum + cal_ber(b, est_b, N);
         end
@@ -198,14 +167,14 @@ for t = 1:3
 
         for j = 1:100
 
-        b = random_bit_seq_generating(N);
+        b = generateRandomBitSequence(N);
         b_3 = repelem(b, 3);
-        s_3 = symbol_mapping(b_3, m, N_3);
-        v_3 = awgn_generating(N0, m, N_3);
-        y_3 = received_signals_generating(s_3, v_3, Ex);      
+        s_3 = mapBitsToSymbols(b_3, m, N_3);
+        v_3 = generateAWGN(N0, numel(s_3));
+        y_3 = generateReceivedSignal(s_3, v_3, Ex);      
 
-        s_hat_3 = ml_detection(y_3, m, Ex);
-        est_b_3 = inverse_symbol_mapping(s_hat_3, m);
+        s_hat_3 = maximumLikelihoodDetection(y_3, m, Ex);
+        est_b_3 = mapSymbolsToBits(s_hat_3, m);
 
         est_b = zeros(1, N);
 
