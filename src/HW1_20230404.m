@@ -1,10 +1,9 @@
-% main code
 % generate sequences and plot received signals in complex plane
 addpath('function/');
 listOfM = [2, 4, 16];
 listOfEx = [1, 10, 1];
 listOfN0 = [1, 10, 0.01];
-
+lengthOfBitSequence = 1024;
 figure;
 plotIndex = 1;
 
@@ -13,7 +12,7 @@ for m = listOfM
         Ex = listOfEx(i);
         N0 = listOfN0(i);
         
-        bitSequence = generateRandomBitSequence(1024);
+        bitSequence = generateRandomBitSequence(lengthOfBitSequence);
         symbolSequence = mapBitsToSymbols(bitSequence, m);
         noiseSequence = generateAWGN(N0, numel(symbolSequence));
         receivedSignalSequence = generateReceivedSignal(symbolSequence, noiseSequence, Ex);
