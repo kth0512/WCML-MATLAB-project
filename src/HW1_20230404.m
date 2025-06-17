@@ -1,6 +1,6 @@
 % main code
 % generate sequences and plot received signals in complex plane
-addpath(fullfile(fileparts(mfilename('fullpath')),'function'));
+addpath('function/'));
 listOfM = [2, 4, 16];
 listOfEx = [1, 10, 1];
 listOfN0 = [1, 10, 0.01];
