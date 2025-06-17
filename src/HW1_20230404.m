@@ -1,7 +1,3 @@
-function randomBitSequence = generateRandomBitSequence(length)
-    randomBitSequence = randi([0 1], 1, length);
-end
-
 function symbolArray = mapBitsToSymbols(bitSequence, M)
     switch M
         case 2,  symbolArray = bpskModulation(bitSequence);
