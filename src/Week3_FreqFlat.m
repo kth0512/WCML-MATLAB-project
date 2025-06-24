@@ -1,3 +1,4 @@
+% simulation
 addpath('function/');
 listOfNtr = [2, 5, 10];
 numOfNtr = numel(listOfNtr);
@@ -17,6 +18,7 @@ for i = 1:numOfNtr
         N0 = 10^(-j/10);
         sumOfBERLS = 0;
         for k = 1:numOfIteration
+            % transmit symbol signal s and receive signal y
             h = generateFrequencyFlatChannel;
             bitSequence = generateRandomBitSequence(lengthOfBitSequence);
             s = mapBitsToSymbols(bitSequence, M);
@@ -25,23 +27,24 @@ for i = 1:numOfNtr
             y = generateReceivedSignalInFreqFlat(symbolWithTraining, v, Ex, h);
             yTraining = y(1:Ntr);
 
-            % Least Square (LS)
+            % estimate h with Least Square and equalize channel effect
             hHatLS = channelEstimationInFreqFlat(filterForLS, yTraining); 
             yEqLS = equalizeFreqFlatChannel(y, hHatLS);
             sHatLS = detectSymbolsWithML(yEqLS(Ntr+1:numOfSymbol+Ntr), M, Ex);
             estimatedBitSequenceLS = mapSymbolsToBits(sHatLS, M);
+
+            % calculate BER
             BERLS = calculateBER(bitSequence, estimatedBitSequenceLS);
             sumOfBERLS = sumOfBERLS + BERLS;
         end
-        % Least Square
         averageOfBERLS = sumOfBERLS/numOfIteration;
         SNR_BER_LS(j+1, 2*i-1:2*i) = [j, averageOfBERLS];
     end
 end
 
-% plot
+% plot BER VS SNR(dB) Curve
 figure;
-hold on;
+hold on; 
 grid on;
 
 markers = {'-o', '-^', '-s'}; 
