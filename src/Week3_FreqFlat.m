@@ -47,7 +47,7 @@ figure;
 hold on; 
 grid on;
 
-% experiment result
+% measured value
 markers = {'-o', '-^', '-s'}; 
 colors  = [  0    0.4470 0.7410;    
             0.4940 0.1840 0.5560;  
