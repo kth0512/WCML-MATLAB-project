@@ -1,7 +1,7 @@
 addpath('function/');
 ListOfNtr = [2, 5, 10];
 numOfNtr = numel(ListOfNtr);
-numOfIteration = 1000;
+numOfIteration = 100000;
 Ex = 1;
 M = 16;
 lengthOfBitSequence = 4*100;
@@ -38,7 +38,6 @@ for i = 1:numOfNtr
     end
 end
 
-disp(SNR_BER_LMMSE)
 disp(SNR_BER_LS)
 figure;
 hold on;
@@ -50,15 +49,15 @@ semilogy(SNR_BER_LS(:, 5), SNR_BER_LS(:, 6), '-s', 'LineWidth', 1.5, 'Color', [0
 
 % ideal value
 SNR_Range = 0:40;                             
-SNR_Linear   = 10.^(SNR_Range/10);
+SNR_Linear = 10.^(SNR_Range/10);
 
 theoreticalBPSK = 0.5 * (1 - sqrt(SNR_Linear ./ (1 + SNR_Linear)));
 semilogy(SNR_Range, theoreticalBPSK, 'k--', ...
-    'LineWidth',1.5, 'DisplayName','BPSK theory');
+    'LineWidth',1.5, 'DisplayName','theoretical BPSK');
 
 theoreticalQPSK = 0.5 * (1 - sqrt(SNR_Linear ./ (2 + SNR_Linear)));
 semilogy(SNR_Range, theoreticalQPSK, 'm--', ...
-    'LineWidth',1.5, 'DisplayName','QPSK theory');
+    'LineWidth',1.5, 'DisplayName','theoretical QPSK');
 
 
 set(gca, 'YScale', 'log');
