@@ -56,7 +56,6 @@ modulationNames = ["BPSK", "QPSK", "16-QAM"];
 modulationOrders = [2, 4, 16];           
 [~, idx]  = ismember(M, modulationOrders);
 
-
 for i = 1:numOfNtr
     nameDisplay = sprintf("Ntr = %d, %s, LS", listOfNtr(i), modulationNames(idx));
     semilogy(SNR_BER_LS(:, 2*i - 1), SNR_BER_LS(:, 2*i), ...
