@@ -1,15 +1,16 @@
 addpath('function/');
-ListOfNtr = [2, 5, 10];
-numOfNtr = numel(ListOfNtr);
+listOfNtr = [2, 5, 10];
+numOfNtr = numel(listOfNtr);
 numOfIteration = 100000;
 Ex = 1;
 M = 16;
-lengthOfBitSequence = 4*100;
+lengthOfBitSequence = log2(M)*100;
 numOfSymbol = 100;
 SNR_BER_LS = zeros(41, 6);
 
+
 for i = 1:numOfNtr
-    Ntr = ListOfNtr(i);
+    Ntr = listOfNtr(i);
     t = sqrt(Ex)*generateZadoffChuTrainingSequence(1, Ntr);
     filterForLS = (t')/(t*t');
     for j = 0:40 
@@ -38,27 +39,47 @@ for i = 1:numOfNtr
     end
 end
 
-disp(SNR_BER_LS)
+% plot
 figure;
 hold on;
 grid on;
 
-semilogy(SNR_BER_LS(:, 1), SNR_BER_LS(:, 2), '-o', 'LineWidth', 1.5, 'Color', [0, 0.4470, 0.7410], 'MarkerEdgeColor', [0, 0.4470, 0.7410], 'DisplayName', 'Ntr = 2, LS');
-semilogy(SNR_BER_LS(:, 3), SNR_BER_LS(:, 4), '-^', 'LineWidth', 1.5, 'Color', [0.4940, 0.1840, 0.5560], 'MarkerEdgeColor', [0.4940, 0.1840, 0.5560], 'DisplayName', 'Ntr = 5, LS');
-semilogy(SNR_BER_LS(:, 5), SNR_BER_LS(:, 6), '-s', 'LineWidth', 1.5, 'Color', [0.4660, 0.6740, 0.1880], 'MarkerEdgeColor', [0.4660, 0.6740, 0.1880], 'DisplayName', 'Ntr = 10, LS');
+markers = {'-o', '-^', '-s'}; 
+colors  = [  0    0.4470 0.7410;    
+            0.4940 0.1840 0.5560;  
+            0.4660 0.6740 0.1880]; 
+modulationNames = ["BPSK", "QPSK", "16-QAM"];
+modulationOrders = [2, 4, 16];           
+[~, idx]  = ismember(M, modulationOrders);
+
+
+for i = 1:numOfNtr
+    nameDisplay = sprintf("Ntr = %d, %s, LS", listOfNtr(i), modulationNames(idx));
+    semilogy(SNR_BER_LS(:, 2*i - 1), SNR_BER_LS(:, 2*i), ...
+        markers{i}, ...
+        'LineWidth', 1.5, ...
+        'Color', colors(i, :), ...
+        'MarkerEdgeColor', colors(i, :), ...
+        'DisplayName', nameDisplay);
+end
 
 % ideal value
 SNR_Range = 0:40;                             
 SNR_Linear = 10.^(SNR_Range/10);
 
 theoreticalBPSK = 0.5 * (1 - sqrt(SNR_Linear ./ (1 + SNR_Linear)));
-semilogy(SNR_Range, theoreticalBPSK, 'k--', ...
-    'LineWidth',1.5, 'DisplayName','theoretical BPSK');
+semilogy(SNR_Range, theoreticalBPSK, ...
+    'LineStyle', '--', ...
+    'Color',       [0.8500, 0.3250, 0.0980], ...
+    'LineWidth',   1.5, ...
+    'DisplayName','theoretical BPSK');
 
 theoreticalQPSK = 0.5 * (1 - sqrt(SNR_Linear ./ (2 + SNR_Linear)));
-semilogy(SNR_Range, theoreticalQPSK, 'm--', ...
-    'LineWidth',1.5, 'DisplayName','theoretical QPSK');
-
+semilogy(SNR_Range, theoreticalQPSK, ...
+    'LineStyle', '--', ...
+    'Color',       [0.0000, 0.6000, 0.7000], ...
+    'LineWidth',   1.5, ...
+    'DisplayName','theoretical QPSK');
 
 set(gca, 'YScale', 'log');
 xlabel('SNR(dB)')
