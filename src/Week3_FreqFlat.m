@@ -47,6 +47,7 @@ figure;
 hold on; 
 grid on;
 
+% experiment result
 markers = {'-o', '-^', '-s'}; 
 colors  = [  0    0.4470 0.7410;    
             0.4940 0.1840 0.5560;  
@@ -66,7 +67,7 @@ for i = 1:numOfNtr
         'DisplayName', nameDisplay);
 end
 
-% ideal value
+% theoretical value
 SNR_Range = 0:40;                             
 SNR_Linear = 10.^(SNR_Range/10);
 
