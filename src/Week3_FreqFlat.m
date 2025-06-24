@@ -19,7 +19,7 @@ for i = 1:numOfNtr
         sumOfBERLS = 0;
         for k = 1:numOfIteration
             % transmit symbol signal s and receive signal y
-            h = generateFrequencyFlatChannel;
+            h = generateFrequencyFlatChannel(1);
             bitSequence = generateRandomBitSequence(lengthOfBitSequence);
             s = mapBitsToSymbols(bitSequence, M);
             v = generateAWGN(N0, numOfSymbol+Ntr);
