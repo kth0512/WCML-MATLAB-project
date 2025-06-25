@@ -31,11 +31,13 @@ for i = 1:numOfSNR
         t_s = [t s];
         y = generateReceivedSignalInFreqSel(t_s, v, h);
         yforChannelEst = y(L:Ntr);
-        hEst = channelEstimation(filter, yforChannelEst.');
+        hEst = channelEstimation(filter, yforChannelEst.').';
+       
         
         for Lf = listOfLf
-            H = toeplitz([hEst ; zeros(Lf-1,1)],[hEst ; zeros(Lf-1,1)]);
-
+            H = toeplitz([hEst ; zeros(Lf-1,1)],[hEst(1) ; zeros(Lf-1,1)]);
+            ndOptimal = findOptimalEqualizerDelay(H, Lf, L);
+            f_nd_LS = calculateLeastSquareEqualizer(H, ndOptimal, Lf, L);
         end
        
     end
