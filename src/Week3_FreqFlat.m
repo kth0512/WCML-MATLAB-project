@@ -13,7 +13,7 @@ SNR_BER_LS = zeros(41, 6);
 for i = 1:numOfNtr
     Ntr = listOfNtr(i);
     t = sqrt(Ex)*generateZadoffChuTrainingSequence(1, Ntr);
-    filterForLS = (t')/(t*t');
+    filterForLS = (t*t')\(t');
     for j = 0:40 
         N0 = 10^(-j/10);
         sumOfBERLS = 0;
@@ -28,7 +28,7 @@ for i = 1:numOfNtr
             yTraining = y(1:Ntr);
 
             % estimate h with Least Square and equalize channel effect
-            hHatLS = channelEstimation(filterForLS, yTraining); 
+            hHatLS = channelEstimation(filterForLS, yTraining.'); 
             yEqLS = equalizeFreqFlatChannel(y, hHatLS);
             sHatLS = detectSymbolsWithML(yEqLS(Ntr+1:numOfSymbol+Ntr), M, Ex);
             estimatedBitSequenceLS = mapSymbolsToBits(sHatLS, M);
