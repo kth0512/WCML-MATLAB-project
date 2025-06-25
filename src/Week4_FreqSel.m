@@ -20,7 +20,7 @@ for i = 1:numOfSNR
     N0 = 10^(-SNR_BER_LS(i, 1)/10);
     sumOfBER = 0;
     for j = 1:numOfIteration
-        
+        h = generateFrequencySelectiveChannel(3, 1/3);
     end
 end
 
