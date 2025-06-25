@@ -1,4 +1,4 @@
-function ndOptimal = optimizeEqualizerDelay(H, Lf)
+function ndOptimal = findOptimalEqualizerDelay(H, Lf)
     ndOptimal = 0;
     Jmin = inf;
     I = eye(Lf);
