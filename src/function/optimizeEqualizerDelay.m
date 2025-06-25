@@ -4,7 +4,7 @@ function ndOptimal = optimizeEqualizerDelay(H, Lf)
     projectionMatrix = (H/(H'*H))*H';
     I = eye(Lf);
     for nd = 0:Lf-1
-        e = zeros(Lf,1);  
+        e = zeros(1, Lf);  
         e(nd+1)=1;
         J = norm((projectionMatrix - I)*e, 2)^2;
         if (J < Jmin)
