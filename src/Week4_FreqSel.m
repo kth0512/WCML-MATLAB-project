@@ -10,17 +10,29 @@ numOfSNR = 5;
 SNR_BER_LS = zeros(numOfSNR, 2);
 SNR_BER_LS(:, 1) = [10, 15, 20, 25, 30]; % [10, 15, 20, 25, 30] <- dB or not?
 L = 3;
-channelTaps = zeros(1, L);
 
 t = generateZadoffChuTrainingSequence(1, Ntr); % 1xNtr row vector
 T = generateTrainingMatrix(t, L);
-filter = T*inv(T'*T);
+filter = (T'*T)\(T');
+
 
 for i = 1:numOfSNR
-    N0 = 10^(-SNR_BER_LS(i, 1)/10);
+    %N0 = 10^(-SNR_BER_LS(i, 1)/10);
+    N0 = 0;
     sumOfBER = 0;
     for j = 1:numOfIteration
-        channelTaps = generateFrequencySelectiveChannel(3, 1/3);
+        h = generateFrequencySelectiveChannel(3, 1/3);
+        b = generateRandomBitSequence(lengthOfBitSequence);
+        s = mapBitsToSymbols(b, M);
+        v = generateAWGN(N0, numOfSymbol+Ntr+L-1);
+        t_s = [t s];
+        y = generateReceivedSignalInFreqSel(t_s, v, h);
+        yforChannelEst = y(L:Ntr);
+        hEst = channelEstimation(filter, yforChannelEst.');
+
+
+       
     end
+    
 end
 
