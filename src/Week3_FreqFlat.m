@@ -28,7 +28,7 @@ for i = 1:numOfNtr
             yTraining = y(1:Ntr);
 
             % estimate h with Least Square and equalize channel effect
-            hHatLS = channelEstimationInFreqFlat(filterForLS, yTraining); 
+            hHatLS = channelEstimation(filterForLS, yTraining); 
             yEqLS = equalizeFreqFlatChannel(y, hHatLS);
             sHatLS = detectSymbolsWithML(yEqLS(Ntr+1:numOfSymbol+Ntr), M, Ex);
             estimatedBitSequenceLS = mapSymbolsToBits(sHatLS, M);
