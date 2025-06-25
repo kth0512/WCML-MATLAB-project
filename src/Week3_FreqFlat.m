@@ -2,21 +2,21 @@
 addpath('function/');
 listOfNtr = [2, 5, 10];
 numOfNtr = numel(listOfNtr);
-numOfIteration = 1000;
+numOfIteration = 100000;
 Ex = 1;
 M = 16;
 lengthOfBitSequence = log2(M)*100;
 numOfSymbol = 100;
-SNR_BER_LS = zeros(41, 6);
+SNR_BER = zeros(41, 6);
 
 
 for i = 1:numOfNtr
     Ntr = listOfNtr(i);
     t = sqrt(Ex)*generateZadoffChuTrainingSequence(1, Ntr);
-    filterForLS = conj(t)/(t*t');
+    filterFor = conj(t)/(t*t');
     for j = 0:40 
         N0 = 10^(-j/10);
-        sumOfBERLS = 0;
+        sumOfBER = 0;
         for k = 1:numOfIteration
             % transmit symbol signal s and receive signal y
             h = generateFrequencyFlatChannel(1);
@@ -28,17 +28,17 @@ for i = 1:numOfNtr
             yTraining = y(1:Ntr);
 
             % estimate h with Least Square and equalize channel effect
-            hHatLS = channelEstimation(filterForLS, yTraining.'); 
-            yEqLS = equalizeFreqFlatChannel(y, hHatLS);
-            sHatLS = detectSymbolsWithML(yEqLS(Ntr+1:numOfSymbol+Ntr), M, Ex);
-            estimatedBitSequenceLS = mapSymbolsToBits(sHatLS, M);
+            hHat = channelEstimation(filterFor, yTraining.'); 
+            yEq = equalizeFreqFlatChannel(y, hHat);
+            sHat = detectSymbolsWithML(yEq(Ntr+1:numOfSymbol+Ntr), M, Ex);
+            estimatedBitSequence = mapSymbolsToBits(sHat, M);
 
             % calculate BER
-            BERLS = calculateBER(bitSequence, estimatedBitSequenceLS);
-            sumOfBERLS = sumOfBERLS + BERLS;
+            BER = calculateBER(bitSequence, estimatedBitSequence);
+            sumOfBER = sumOfBER + BER;
         end
-        averageOfBERLS = sumOfBERLS/numOfIteration;
-        SNR_BER_LS(j+1, 2*i-1:2*i) = [j, averageOfBERLS];
+        averageOfBER = sumOfBER/numOfIteration;
+        SNR_BER(j+1, 2*i-1:2*i) = [j, averageOfBER];
     end
 end
 
@@ -58,7 +58,7 @@ modulationOrders = [2, 4, 16];
 
 for i = 1:numOfNtr
     nameDisplay = sprintf("Ntr = %d, %s, LS", listOfNtr(i), modulationNames(idx));
-    semilogy(SNR_BER_LS(:, 2*i - 1), SNR_BER_LS(:, 2*i), ...
+    semilogy(SNR_BER(:, 2*i - 1), SNR_BER(:, 2*i), ...
         markers{i}, ...
         'LineWidth', 1.5, ...
         'Color', colors(i, :), ...
