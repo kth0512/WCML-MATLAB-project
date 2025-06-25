@@ -5,7 +5,7 @@ function ndOptimal = findOptimalEqualizerDelay(H, Lf, L)
     I = eye(Lf+L-1);
     projectionMatrix = H*calculateLeftInverse(H);
     disp(size(projectionMatrix))
-    for nd = 0:Lf-1
+    for nd = 0:Lf+L-2
         e = zeros(Lf+L-1,1);  
         e(nd+1)=1;
         
