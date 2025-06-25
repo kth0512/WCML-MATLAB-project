@@ -14,6 +14,7 @@ channelTaps = zeros(L);
 
 t = generateZadoffChuTrainingSequence(1, Ntr); % 1xNtr row vector
 T = generateTrainingMatrix(t, L);
+filter = T*inv(T'*T);
 
 for i = 1:numOfSNR
     N0 = 10^(-SNR_BER_LS(i, 1)/10);
