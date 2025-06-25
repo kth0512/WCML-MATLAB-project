@@ -2,7 +2,7 @@
 addpath('function/');
 listOfNtr = [2, 5, 10];
 numOfNtr = numel(listOfNtr);
-numOfIteration = 100000;
+numOfIteration = 1000;
 Ex = 1;
 M = 16;
 lengthOfBitSequence = log2(M)*100;
@@ -13,7 +13,7 @@ SNR_BER_LS = zeros(41, 6);
 for i = 1:numOfNtr
     Ntr = listOfNtr(i);
     t = sqrt(Ex)*generateZadoffChuTrainingSequence(1, Ntr);
-    filterForLS = (t*t')\(t');
+    filterForLS = conj(t)/(t*t');
     for j = 0:40 
         N0 = 10^(-j/10);
         sumOfBERLS = 0;
