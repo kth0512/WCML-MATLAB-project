@@ -10,7 +10,7 @@ numOfSNR = 5;
 SNR_BER_LS = zeros(numOfSNR, 2);
 SNR_BER_LS(:, 1) = [10, 15, 20, 25, 30]; % [10, 15, 20, 25, 30] <- dB or not?
 L = 3;
-channelTaps = zeros(L);
+channelTaps = zeros(1, L);
 
 t = generateZadoffChuTrainingSequence(1, Ntr); % 1xNtr row vector
 T = generateTrainingMatrix(t, L);
@@ -20,7 +20,7 @@ for i = 1:numOfSNR
     N0 = 10^(-SNR_BER_LS(i, 1)/10);
     sumOfBER = 0;
     for j = 1:numOfIteration
-        h = generateFrequencySelectiveChannel(3, 1/3);
+        channelTaps = generateFrequencySelectiveChannel(3, 1/3);
     end
 end
 
