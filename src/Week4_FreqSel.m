@@ -12,7 +12,7 @@ numOfSymbol = 100;
 numOfSNR = 5;
 numOfLf = 2;
 
-SNRdB = [10, 15, 20, 25, 30]; % [10, 15, 20, 25, 30] <- dB or not?
+SNRdB = 10:5:30; % [10, 15, 20, 25, 30] <- dB or not?
 BER = zeros(numOfLf, numOfSNR);
 listOfLf = [5, 10];
 
@@ -36,12 +36,13 @@ for i = 1:numOfSNR
         for k = 1:numOfLf
             Lf = listOfLf(k);
             % calculate equalizer
-            H = toeplitz([hEst ; zeros(Lf-1,1)],[hEst(1) ; zeros(Lf-1,1)]); % 여기까지 굿
+            H = toeplitz([hEst ; zeros(Lf-1,1)],[hEst(1), zeros(1,Lf - 1)]); % 여기까지 굿
             ndOptimal = findOptimalEqualizerDelay(H, Lf, L);
             f_nd_LS = calculateLeastSquareEqualizer(H, ndOptimal, Lf, L);
 
             % perform equalization
-            sHat = detectSymbolsWithML(equalizeFreqSelChannel(f_nd_LS, y(Ntr+1:end), ndOptimal, numOfSymbol, Lf), M, Ex);
+            equalizedSignal = equalizeFreqSelChannel(f_nd_LS, y(Ntr+1:end), ndOptimal, numOfSymbol, Lf);
+            sHat = detectSymbolsWithML(equalizedSignal, M, Ex);
             estimatedBitSequence = mapSymbolsToBits(sHat, M);
            
             sumOfBER(k) = sumOfBER(k) + calculateBER(bitSequence, estimatedBitSequence); 
@@ -83,5 +84,5 @@ xlabel('SNR(dB)')
 ylabel('BER')
 title('BER VS SNR Curve');
 legend('Location', 'best');
-ylim('auto')
+ylim([10^(-4), 1])
 hold off;
