@@ -5,8 +5,8 @@ numOfNtr = numel(listOfNtr);
 numOfIteration = 100000;
 Ex = 1;
 M = 16;
-lengthOfBitSequence = log2(M)*100;
 numOfSymbol = 100;
+lengthOfBitSequence = log2(M)*numOfSymbol;
 SNR_BER = zeros(41, 6);
 
 
