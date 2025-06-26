@@ -6,15 +6,17 @@ Ex = 1;
 M = 16;
 L = 3;
 
-lengthOfBitSequence = log2(M)*100;
-numOfIteration = 100000;
+numOfIteration = 10000;
 numOfSymbol = 100;
-numOfSNR = 5;
-numOfLf = 2;
+lengthOfBitSequence = log2(M)*numOfSymbol;
 
 SNRdB = 10:5:30; % dB or not?
+numOfSNR = length(SNRdB);
+
 BER = zeros(numOfLf, numOfSNR);
+
 listOfLf = [5, 10];
+numOfLf = length(listOfLf);
 
 t = generateZadoffChuTrainingSequence(1, Ntr); % 1xNtr row vector
 T = generateTrainingMatrix(t, L);
