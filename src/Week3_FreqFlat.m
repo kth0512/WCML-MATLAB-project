@@ -87,7 +87,7 @@ semilogy(SNR_Range, theoreticalQPSK, ...
 set(gca, 'YScale', 'log');
 xlabel('SNR(dB)')
 ylabel('BER')
-title('Frequency Flat BER VS SNR');
+title('Frequency Flat');
 legend('Location', 'best');
 ylim('auto')
 hold off;
