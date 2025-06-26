@@ -7,12 +7,12 @@ M = 16;
 L = 3;
 
 lengthOfBitSequence = log2(M)*100;
-numOfIteration = 1000;
+numOfIteration = 100000;
 numOfSymbol = 100;
 numOfSNR = 5;
 numOfLf = 2;
 
-SNRdB = 10:5:30; % [10, 15, 20, 25, 30] <- dB or not?
+SNRdB = 10:5:30; % dB or not?
 BER = zeros(numOfLf, numOfSNR);
 listOfLf = [5, 10];
 
@@ -38,7 +38,7 @@ for i = 1:numOfSNR
             % calculate equalizer
             H = toeplitz([hEst ; zeros(Lf-1,1)],[hEst(1), zeros(1,Lf - 1)]); % 여기까지 굿
             ndOptimal = findOptimalEqualizerDelay(H, Lf, L);
-            f_nd_LS = calculateLeastSquareEqualizer(H, ndOptimal, Lf, L);
+            f_nd_LS = calculateLeastSquareEqualizer(H, ndOptimal, Lf, L); %  Lf x 1 column vector
 
             % perform equalization
             equalizedSignal = equalizeFreqSelChannel(f_nd_LS, y(Ntr+1:end), ndOptimal, numOfSymbol, Lf);
