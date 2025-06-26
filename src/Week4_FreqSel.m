@@ -82,7 +82,7 @@ end
 set(gca, 'YScale', 'log');
 xlabel('SNR(dB)')
 ylabel('BER')
-title('BER VS SNR Curve');
+title('Frequency Selective BER vs SNR');
 legend('Location', 'best');
 ylim([10^(-4), 1])
 hold off;
