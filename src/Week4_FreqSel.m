@@ -13,10 +13,9 @@ lengthOfBitSequence = log2(M)*numOfSymbol;
 SNRdB = 10:5:30; % dB or not?
 numOfSNR = length(SNRdB);
 
-BER = zeros(numOfLf, numOfSNR);
-
 listOfLf = [5, 10];
 numOfLf = length(listOfLf);
+BER = zeros(numOfLf, numOfSNR);
 
 t = generateZadoffChuTrainingSequence(1, Ntr); % 1xNtr row vector
 T = generateTrainingMatrix(t, L);
