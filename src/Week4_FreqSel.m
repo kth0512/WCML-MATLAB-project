@@ -6,14 +6,14 @@ Ex = 1;
 M = 16;
 L = 3;
 
-numOfIteration = 10000;
+numOfIteration = 1000;
 numOfSymbol = 100;
 lengthOfBitSequence = log2(M)*numOfSymbol;
 
 SNRdB = 10:5:30; % dB or not?
 numOfSNR = length(SNRdB);
 
-listOfLf = [5, 10];
+listOfLf = [5, 10, 100];
 numOfLf = length(listOfLf);
 BER = zeros(numOfLf, numOfSNR);
 
@@ -62,10 +62,10 @@ hold on;
 grid on;
 
 % measured value
-markers = {'-o', '-^', '-s'}; 
-colors  = [  0    0.4470 0.7410;    
-            0.4940 0.1840 0.5560;  
-            0.4660 0.6740 0.1880]; 
+markers = {'-s', '-s', '-s'}; 
+colors  = [ 1      0.4980 0.0549;    
+            0.1216 0.4667 0.7059;  
+            0.49   0.70   0.26]; 
 modulationNames = ["BPSK", "QPSK", "16-QAM"];
 modulationOrders = [2, 4, 16];           
 [~, idx]  = ismember(M, modulationOrders);
