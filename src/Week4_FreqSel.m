@@ -79,7 +79,7 @@ for i = 1:numOfLf
         'MarkerEdgeColor', colors(i, :), ...
         'DisplayName', nameDisplay);
 end
-
+xticks(10:5:30);
 set(gca, 'YScale', 'log');
 xlabel('SNR(dB)')
 ylabel('BER')
