@@ -37,7 +37,7 @@ for i = 1:numOfSNR
         for k = 1:numOfLf
             Lf = listOfLf(k);
             % calculate equalizer
-            H = toeplitz([hEst ; zeros(Lf-1,1)],[hEst(1), zeros(1,Lf - 1)]); % 여기까지 굿
+            H = toeplitz([hEst ; zeros(Lf-1,1)],[hEst(1), zeros(1,Lf - 1)]); 
             ndOptimal = findOptimalEqualizerDelay(H, Lf, L);
             f_nd_LS = calculateLeastSquareEqualizer(H, ndOptimal, Lf, L); %  Lf x 1 column vector
 
