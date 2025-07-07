@@ -10,7 +10,7 @@ numOfIteration = 1000;
 numOfSymbol = 100;
 lengthOfBitSequence = log2(M)*numOfSymbol;
 
-SNRdB = 10:5:30; % dB or not?
+SNRdB = 10:5:30;
 numOfSNR = length(SNRdB);
 
 listOfLf = [5, 10, 100];
