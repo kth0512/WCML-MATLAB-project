@@ -1,9 +1,9 @@
 listOfNr = [1, 2, 4, 8];
 numOfNr = length(listOfNr);
 
-listOfBerRAS = zeros(4, 25);
-listOfBerMRC = zeros(4, 25);
-numOfBER = size(listOfBerMRC, 2);
+numOfBER = 25;
+listOfBerWithRAS = zeros(numOfNr, numOfBER);
+listOfBerWithMRC = zeros(numOfNr, numOfBER);
 snrRange = 0:numOfBER-1;
 
 Ex = 1;
@@ -22,7 +22,7 @@ for idxBeamforming = 1:numOfBeamformingMethod
             for idxIteration = 1:numOfIteration
                 bitSequence = generateRandomBitSequence(lengthOfBitSequence);
                 s = mapBitsToSymbols(bitSequence, M); % row vector
-                h = generateFrequencySelectiveChannel(Nr, 1).'; % column vector 
+                h = generateChannelVector(Nr, 1).'; % column vector 
         
                 v = generateAWGN(N0, Nr*numOfSymbol).'; % column vector
                 V = reshape(v, Nr, numOfSymbol);
@@ -39,7 +39,6 @@ for idxBeamforming = 1:numOfBeamformingMethod
                         w = h./(h'*h); 
                 end  
                 r = w'*Y; % row vector
-                
         
                 sHat = detectSymbolsWithML(r, M, Ex);
                 estimatedBitSequence = mapSymbolsToBits(sHat, M);
@@ -47,13 +46,12 @@ for idxBeamforming = 1:numOfBeamformingMethod
                 ber = calculateBER(bitSequence, estimatedBitSequence);
                 sumBER = sumBER + ber;
             end
-
             avgBER = sumBER/numOfIteration;
             switch idxBeamforming
                 case 1
-                    listOfBerRAS(idxNr, idxSNR) = avgBER;
+                    listOfBerWithRAS(idxNr, idxSNR) = avgBER;
                 case 2
-                    listOfBerMRC(idxNr, idxSNR) = avgBER;
+                    listOfBerWithMRC(idxNr, idxSNR) = avgBER;
             end
 
         end
@@ -77,7 +75,7 @@ modulationOrders = [2, 4, 16];
 % RAS
 for i = 1:numOfNr
     nameDisplay = sprintf("RAS, Nr = %d, %s", listOfNr(i), modulationNames(idx));
-    semilogy(snrRange, listOfBerRAS(i,:), ...   
+    semilogy(snrRange, listOfBerWithRAS(i,:), ...   
         markers{i}, ...
         'LineStyle', ':', ...        
         'LineWidth', 1.5, ...
@@ -88,14 +86,13 @@ end
 % MRC
 for i = 1:numOfNr
     nameDisplay = sprintf("MRC, Nr = %d, %s", listOfNr(i), modulationNames(idx));
-    semilogy(snrRange, listOfBerMRC(i,:), ...
+    semilogy(snrRange, listOfBerWithMRC(i,:), ...
         markers{i}, ...
         'LineWidth', 1.5, ...
         'Color', colors(i, :), ...
         'MarkerEdgeColor', colors(i, :), ...
         'DisplayName', nameDisplay);
 end
-
 
 set(gca, 'YScale', 'log');
 xlabel('SNR(dB)')
