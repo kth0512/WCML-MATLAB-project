@@ -1,3 +1,5 @@
+addpath('function/');
+
 listOfNr = [1, 2, 4, 8];
 numOfNr = length(listOfNr);
 
