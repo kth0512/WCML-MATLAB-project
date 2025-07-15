@@ -64,10 +64,10 @@ grid on;
 
 % measured value
 markers = {'-s', '-o', '-d', '-^'}; 
-colors  = [ 0 0 1;    
-            0 0.5 0;  
-            1 0 0 
-            0.5 0 0.5]; 
+colors  = [ 1 0 0;    
+            0.4660 0.6740 0.1880;  
+            0 0.4470 0.7410 
+            0.9290 0.6940 0.1250]; 
 modulationNames = ["BPSK", "QPSK", "16-QAM"];
 modulationOrders = [2, 4, 16];           
 [~, idx]  = ismember(M, modulationOrders);
