@@ -23,23 +23,27 @@ for idxNt = 1:numofAntennaNumber
             sumBER = 0;
             for idxIteration = 1:numOfIteration
                 H = generateChannelMatrix(Nr, Nt, 1);
-                [U, Lambda, V] = svd(H, 'econ');
-                lambda = diag(Lambda);
-                rootPower = waterFillingAllocation(lambda, Ex, N0);
-                Ns = size(rootPower, 2);
-                F = V(1:Ns, 1:Ns)*rootPower;
-                W = U(1:Ns, 1:Ns);
+                [U, S, V] = svd(H, 'econ');
+                lambda = diag(S);
+                [rootPower, idxActive] = waterFillingAllocation(lambda, Ex, N0);
+                Ns = sum(idxActive);
+                disp(Ns)
+                F = V(:, idxActive)*rootPower;
+                W = U(:, idxActive);
                 slotNumber = ceil(numOfSymbol/Ns);
                 numOfPaddedSymbols = Ns*slotNumber - numOfSymbol;
-                
-                % 차원 확실히 체크
+                    
                 b = generateRandomBitSequence(lengthOfBitSequence);
-                s = [mapBitsToSymbols(b, M); zeros(1, numOfPaddedSymbols)];
-                v = generateAWGN(N0, Ns*slotNumber);
-                S = reshape(s, Ns, slotNumber);
-                V = reshape(v, Ns, slotNumber);
-                R = W'*H*F*S + W'*V;
-                r = reshape(R, 1, Ns*slotNumber);
+                s = [mapBitsToSymbols(b, M), zeros(1, numOfPaddedSymbols)];
+                v = generateAWGN(N0, Nr*slotNumber);
+                symbolMatrix = reshape(s, Ns, slotNumber);
+                noiseMatrix = reshape(v, Nr, slotNumber);
+                R = W'*H*F*symbolMatrix + W'*noiseMatrix;
+
+                lambdaActive = lambda(idxActive);
+                gainVector = sqrt(diag(rootPower)).*lambdaActive;
+                Req = R./gainVector;
+                r = reshape(Req, 1, Ns*slotNumber);
                 rSymbol = r(1:numOfSymbol);
 
                 sHat = detectSymbolsWithML(rSymbol, M, Ex);
@@ -68,15 +72,14 @@ modulationNames = ["BPSK", "QPSK", "16-QAM"];
 modulationOrders = [2, 4, 16];           
 [~, idx]  = ismember(M, modulationOrders);
 
-for i = 1:numOfNt
-    for j = 1:numOfNr
-        idx = (i-1)*numofAntennaNumber+j;
+for i = 1:numofAntennaNumber
+    for j = 1:numofAntennaNumber
+        idxAntenna = (i-1)*numofAntennaNumber+j;
         nameDisplay = sprintf("Nt = %d, Nr = %d, %s", listOfAntennaNumber(i), listOfAntennaNumber(j), modulationNames(idx));
-        semilogy(snrRange, listOfBer(idx,:), ...   
-            markers{idx}, ...
-            'LineStyle', ':', ...        
+        semilogy(snrRange, listOfBer(idxAntenna,:), ...   
+            markers{idxAntenna}, ...      
             'LineWidth', 1.5, ...
-            'Color', colors(idx,:), ...
+            'Color', colors(idxAntenna,:), ...
             'DisplayName', nameDisplay);
     end
 end
@@ -86,5 +89,5 @@ xlabel('SNR(dB)')
 ylabel('BER')
 title('MIMO');
 legend('Location', 'best');
-ylim([1e-6 1])
+ylim('auto')
 hold off;
