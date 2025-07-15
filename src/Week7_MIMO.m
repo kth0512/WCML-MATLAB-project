@@ -27,7 +27,6 @@ for idxNt = 1:numofAntennaNumber
                 lambda = diag(S);
                 [rootPower, idxActive] = waterFillingAllocation(lambda, Ex, N0);
                 Ns = sum(idxActive);
-                disp(Ns)
                 F = V(:, idxActive)*rootPower;
                 W = U(:, idxActive);
                 slotNumber = ceil(numOfSymbol/Ns);
