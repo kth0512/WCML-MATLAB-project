@@ -10,7 +10,7 @@ listOfBer = zeros(numofAntennaNumber^2, numOfSNR);
 
 Ex = 1;
 M = 16;
-numOfIteration = 1000;
+numOfIteration = 5000;
 numOfSymbol = 100;
 lengthOfBitSequence = log2(M)*numOfSymbol;
 
@@ -40,7 +40,7 @@ for idxNt = 1:numofAntennaNumber
                 R = W'*H*F*symbolMatrix + W'*noiseMatrix;
 
                 lambdaActive = lambda(idxActive);
-                gainVector = sqrt(diag(rootPower)).*lambdaActive;
+                gainVector = diag(rootPower).*lambdaActive;
                 Req = R./gainVector;
                 r = reshape(Req, 1, Ns*slotNumber);
                 rSymbol = r(1:numOfSymbol);
