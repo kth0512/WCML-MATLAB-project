@@ -10,7 +10,7 @@ listOfBer = zeros(numofAntennaNumber^2, numOfSNR);
 
 Ex = 1;
 M = 16;
-numOfIteration = 5000;
+numOfIteration = 100000;
 numOfSymbol = 100;
 lengthOfBitSequence = log2(M)*numOfSymbol;
 
