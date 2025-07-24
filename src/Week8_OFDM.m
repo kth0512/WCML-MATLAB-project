@@ -29,7 +29,7 @@ for idxSNR = 1:numOfSNR
         h = generateChannelVector(L, 1/L).'; % column vector
         h_padded = [h; zeros(N-L,1)];   
         H_circ = gallery('circul', h_padded).';   
-        v_bar = generateAWGN(1/(10^(snrRange(idxSNR)/10)), N).'; % frequency domian
+        v_bar = generateAWGN(1/(10^(snrRange(idxSNR)/10)), N).'; % column vector
 
         % Receiver
         y_bar = H_circ*s_t + v_bar;
